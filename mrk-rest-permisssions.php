@@ -55,7 +55,11 @@ function mrk_remove_rest_users( $endpoints ) {
 	}
 	return $endpoints;
 }
-
-if ( ! is_user_logged_in() ) {
-	add_filter( 'rest_endpoints', 'mrk_remove_rest_users' );
+// check if function exists as its pluggable.
+if ( function_exists( is_user_logged_in() ) ) {
+	// If user is not logged in add the filter function to remove the end points.
+	if ( ! is_user_logged_in() ) {
+		add_filter( 'rest_endpoints', 'mrk_remove_rest_users' );
+	}
 }
+
