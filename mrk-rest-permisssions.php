@@ -7,7 +7,7 @@
  * Author URI:      https://www.mrkwp.com
  * Text Domain:     mrk-rest-permissions
  * Domain Path:     /languages
- * Version:         1.0.0
+ * Version:         1.0.1
  * PHP version:     8.3
  *
  * @category Plugin
@@ -20,23 +20,13 @@
 // If this file is called firectly, abort!!!
 defined( 'ABSPATH' ) or die( 'No Access!' );
 
-define( 'MRK_REST_PERMISSIONS_PLUGIN_VERSION', '1.0.0' );
-
-define( 'MRK_REST_PERMISSIONS_PLUGIN_FILE', __FILE__ );
-define( 'MRK_REST_PERMISSIONS_PLUGIN_DIR', __DIR__ . DIRECTORY_SEPARATOR );
-
-// Require once the Composer Autoload.
-if ( file_exists( __DIR__ . '/lib/autoload.php' ) ) {
-	include_once __DIR__ . '/lib/autoload.php';
-}
-
 /**
  * The code that runs during plugin activation.
  *
  * @return void
  */
 function activate_mrk_rest_permissions_plugin() {
-	MRK_Rest_Permissions\Base\Activate::activate();
+	flush_rewrite_rules();
 }
 register_activation_hook( __FILE__, 'activate_mrk_rest_permissions_plugin' );
 
@@ -46,13 +36,26 @@ register_activation_hook( __FILE__, 'activate_mrk_rest_permissions_plugin' );
  * @return void
  */
 function deactivate_mrk_rest_permissions_plugin() {
-	MRK_Rest_Permissions\Base\Deactivate::deactivate();
+	flush_rewrite_rules();
 }
 register_deactivation_hook( __FILE__, 'deactivate_mrk_rest_permissions_plugin' );
-
 /**
- * Initialize all the core classes of the plugin.
+ * Remove users from REST
+ *
+ * @param array $endpoints A string containing the users endpoint.
+ *
+ * @return array
  */
-if ( class_exists( 'MRK_Rest_Permissions\\Init' ) ) {
-		MRK_Rest_Permissions\Init::register_services();
+function mrk_remove_rest_users( $endpoints ) {
+	if ( isset( $endpoints['/wp/v2/users'] ) ) {
+		unset( $endpoints['/wp/v2/users'] );
+	}
+	if ( isset( $endpoints['/wp/v2/users/(?P<id>[\d]+)'] ) ) {
+		unset( $endpoints['/wp/v2/users/(?P<id>[\d]+)'] );
+	}
+	return $endpoints;
+}
+
+if ( ! is_user_logged_in() ) {
+	add_filter( 'rest_endpoints', 'mrk_remove_rest_users' );
 }
