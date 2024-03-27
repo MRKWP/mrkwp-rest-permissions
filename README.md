@@ -2,7 +2,7 @@
 
 MRK Rest Permissions Plugin by MRK WP
 
-Version 1.0.0
+Version 1.0.1
 
 ## Changelog
 
