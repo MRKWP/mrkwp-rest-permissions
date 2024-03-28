@@ -49,7 +49,6 @@ register_deactivation_hook( __FILE__, 'deactivate_mrk_rest_permissions_plugin' )
  */
 function mrk_remove_rest_users( $endpoints ) {
 	if ( isset( $endpoints['/wp/v2/users'] ) ) {
-		do_action( 'qm/debug', $endpoints['/wp/v2/users'] );
 		unset( $endpoints['/wp/v2/users'] );
 	}
 	if ( isset( $endpoints['/wp/v2/users/(?P<id>[\d]+)'] ) ) {
