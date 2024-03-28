@@ -39,6 +39,7 @@ function deactivate_mrk_rest_permissions_plugin() {
 	flush_rewrite_rules();
 }
 register_deactivation_hook( __FILE__, 'deactivate_mrk_rest_permissions_plugin' );
+
 /**
  * Remove users from REST
  *
@@ -48,6 +49,7 @@ register_deactivation_hook( __FILE__, 'deactivate_mrk_rest_permissions_plugin' )
  */
 function mrk_remove_rest_users( $endpoints ) {
 	if ( isset( $endpoints['/wp/v2/users'] ) ) {
+		do_action( 'qm/debug', $endpoints['/wp/v2/users'] );
 		unset( $endpoints['/wp/v2/users'] );
 	}
 	if ( isset( $endpoints['/wp/v2/users/(?P<id>[\d]+)'] ) ) {
@@ -55,11 +57,20 @@ function mrk_remove_rest_users( $endpoints ) {
 	}
 	return $endpoints;
 }
-// check if function exists as its pluggable.
-if ( function_exists( is_user_logged_in() ) ) {
-	// If user is not logged in add the filter function to remove the end points.
-	if ( ! is_user_logged_in() ) {
-		add_filter( 'rest_endpoints', 'mrk_remove_rest_users' );
+
+/**
+ * Initialise the tool to make sure the function exists for checking loggins.
+ * Will then run the additional code to edit the rest endpoints.
+ *
+ * @return void
+ */
+function mrk_auth_rest_endpoints() {
+	// check if function exists as its pluggable.
+	if ( function_exists( 'is_user_logged_in' ) ) {
+		// If user is not logged in function found, add the filter function to remove the end points.
+		if ( ! is_user_logged_in() ) {
+			add_filter( 'rest_endpoints', 'mrk_remove_rest_users' );
+		}
 	}
 }
-
+add_action( 'init', 'mrk_auth_rest_endpoints' );
