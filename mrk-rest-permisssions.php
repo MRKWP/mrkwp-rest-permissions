@@ -7,7 +7,7 @@
  * Author URI:      https://www.mrkwp.com
  * Text Domain:     mrk-rest-permissions
  * Domain Path:     /languages
- * Version:         1.0.1
+ * Version:         1.0.2
  * PHP version:     8.3
  *
  * @category Plugin
