@@ -70,14 +70,14 @@ function mrk_add_permission_rest_users( $endpoints ) {
 		// Get permission callback part from rest object endpoint.
 		$users_get_route = &$endpoints['/wp/v2/users'][0];
 
-		// Bind new permission to users endpoint to create 403 if not logged in.
+		// Bind new permission to users endpoint to create 401 if not logged in.
 		$users_get_route['permission_callback'] = mrk_permission_callback_hardener( $users_get_route['permission_callback'] );
 	}
 	if ( isset( $endpoints['/wp/v2/users/(?P<id>[\d]+)'] ) ) {
 		// Get permission callback part from rest object endpoint.
 		$user_get_route = &$endpoints['/wp/v2/users/(?P<id>[\d]+)'][0];
 
-		// Bind new permission to user/id endpoint to create 403 if not logged in.
+		// Bind new permission to user/id endpoint to create 401 if not logged in.
 		$user_get_route['permission_callback'] = mrk_permission_callback_hardener( $user_get_route['permission_callback'] );
 	}
 	return $endpoints;
