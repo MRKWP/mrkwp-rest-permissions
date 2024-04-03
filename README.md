@@ -28,6 +28,9 @@ The user / author selection box inside the Block Editor will disappear when a 40
 
 If a 404 is returned it creates errors in the block editor.
 
+See "User Information Disclosure via REST API CVE 2017-5487."
+
+Reference URL for CVE: <https://www.cvedetails.com/cve/CVE-2017-5487/>
 
 ## Changelog
 
