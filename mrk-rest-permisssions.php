@@ -41,34 +41,59 @@ function deactivate_mrk_rest_permissions_plugin() {
 register_deactivation_hook( __FILE__, 'deactivate_mrk_rest_permissions_plugin' );
 
 /**
- * Remove users from REST
+ * Permission Callback to throw a 403 error on rest API for user endpoints.
+ * Use Edit Post capability to ensure Gutenberg / Block Editor works as expected.
+ *
+ * @param [type] $existing_callback // The existing callback for permission on REST Endpoint.
+ * @return callback function.
+ */
+function mrk_permission_callback_hardener( $existing_callback ) {
+	return function ( $request ) use( $existing_callback ) {
+		return new WP_Error(
+			'rest_user_cannot_view',
+			__( 'Sorry, you are not allowed to access users.' ),
+			array( 'status' => rest_authorization_required_code() )
+		);
+	};
+}
+
+/**
+ * Add permission to all user endpoints inside REST API.
  *
  * @param array $endpoints A string containing the users endpoint.
  *
  * @return array
  */
-function mrk_remove_rest_users( $endpoints ) {
+function mrk_add_permission_rest_users( $endpoints ) {
 	if ( isset( $endpoints['/wp/v2/users'] ) ) {
-		unset( $endpoints['/wp/v2/users'] );
+		// Get permission callback part from rest object endpoint.
+		$users_get_route = &$endpoints['/wp/v2/users'][0];
+
+		// Bind new permission to users endpoint to create 403 if not logged in.
+		$users_get_route['permission_callback'] = mrk_permission_callback_hardener( $users_get_route['permission_callback'] );
 	}
 	if ( isset( $endpoints['/wp/v2/users/(?P<id>[\d]+)'] ) ) {
-		unset( $endpoints['/wp/v2/users/(?P<id>[\d]+)'] );
+		// Get permission callback part from rest object endpoint.
+		$user_get_route = &$endpoints['/wp/v2/users/(?P<id>[\d]+)'][0];
+
+		// Bind new permission to user/id endpoint to create 403 if not logged in.
+		$user_get_route['permission_callback'] = mrk_permission_callback_hardener( $user_get_route['permission_callback'] );
 	}
 	return $endpoints;
 }
 
 /**
- * Initialise the tool to make sure the function exists for checking loggins.
- * Will then run the additional code to edit the rest endpoints.
+ * Initialise the tool and add end point when user cannot edit posts.
+ * Need to use INIT as current_user_can always returns false when called over rest API context.
+ * Will then run the additional code to edit the rest endpoints ONLY when a user has not edit permissions.
  *
  * @return void
  */
 function mrk_auth_rest_endpoints() {
 	// check if function exists as its pluggable.
-	if ( function_exists( 'is_user_logged_in' ) ) {
-		// If user is not logged in function found, add the filter function to remove the end points.
-		if ( ! is_user_logged_in() ) {
-			add_filter( 'rest_endpoints', 'mrk_remove_rest_users' );
+	if ( function_exists( 'current_user_can' ) ) {
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			add_filter( 'rest_endpoints', 'mrk_add_permission_rest_users' );
 		}
 	}
 }
