@@ -41,8 +41,8 @@ function deactivate_mrk_rest_permissions_plugin() {
 register_deactivation_hook( __FILE__, 'deactivate_mrk_rest_permissions_plugin' );
 
 /**
- * Permission Callback to throw a 403 error on rest API for user endpoints.
- * Use Edit Post capability to ensure Gutenberg / Block Editor works as expected.
+ * Permission Callback to throw a 401 error on rest API for user endpoints.
+ * Callback should be called from an Init with any role checks already complete.
  *
  * @param [type] $existing_callback // The existing callback for permission on REST Endpoint.
  * @return callback function.
@@ -59,10 +59,11 @@ function mrk_permission_callback_hardener( $existing_callback ) {
 
 /**
  * Add permission to all user endpoints inside REST API.
+ * Function should be called from an Init with any role checks already complete.
  *
  * @param array $endpoints A string containing the users endpoint.
  *
- * @return array
+ * @return array $endpoints adjusted with new permission callback hardener.
  */
 function mrk_add_permission_rest_users( $endpoints ) {
 	if ( isset( $endpoints['/wp/v2/users'] ) ) {
@@ -84,8 +85,8 @@ function mrk_add_permission_rest_users( $endpoints ) {
 
 /**
  * Initialise the tool and add end point when user cannot edit posts.
- * Need to use INIT as current_user_can always returns false when called over rest API context.
- * Will then run the additional code to edit the rest endpoints ONLY when a user has not edit permissions.
+ * Need to use INIT as current_user_can return false when called over rest API context as pluggable functions may not be available.
+ * After permission check run function to edit the rest endpoints.
  *
  * @return void
  */
