@@ -14,6 +14,8 @@ Alot of audits and Essential 8 security teams will ask this to be closed.
 
 It will be identified as a "medium" security risk.
 
+Youtube video breakdown is here: https://youtu.be/ZtbxaWQLRI4
+
 ## FAQ
 
 ### What does the end point return when it is called?
