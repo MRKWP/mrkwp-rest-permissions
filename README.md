@@ -16,7 +16,7 @@ It will be identified as a "medium" security risk.
 
 Youtube video breakdown is here: https://youtu.be/ZtbxaWQLRI4
 
-Read more about on the blog here: https://www.mrkwp.com/wp/secure-user-rest-api/
+Read more about on the plugin here: https://www.mrkwp.com/wp/secure-user-rest-api/
 
 ## FAQ
 
